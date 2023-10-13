@@ -46,6 +46,7 @@ class Record:
             if phone.value == old_phone.value:
                 self.phones[idx] = new_phone
                 return f"Phone {old_phone} changed to phone {new_phone}"
+        raise PhoneError
 
     def find_phone(self, phone):
         for p in self.phones:
@@ -54,10 +55,10 @@ class Record:
         raise PhoneError
 
     def remove_phone(self, phone):
-        if phone.value in self.phones:
-            self.phones.remove(phone)
-        else:
-            raise PhoneError
+        for p in self.phones:
+            if phone.value == p.value:
+                return self.phones.remove(p)
+        raise PhoneError
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -65,7 +66,7 @@ class Record:
 
 class AddressBook(UserDict):
 
-    def add_record(self, record):
+    def add_record(self, record: Record):
         self.data[record.name.value] = record
 
     def find(self, record):
@@ -122,7 +123,6 @@ def change_record(*args):
     new_phone = Phone(args[2])
     rec = customers.get(name.value)
     if rec:
-        print(f"{args[0].capitalize()}'s phone {args[1]} changed to {args[2]}")
         return rec.edit_phone(old_phone, new_phone)
     else:
         raise KeyError
@@ -168,7 +168,7 @@ def find_phone(*args):
     rec = customers.get(name.value)
     if rec:
         find_phone = rec.find_phone(phone)
-        return f'{name.value} : {find_phone}'
+        return find_phone  # f'{name.value} : {find_phone}'
     else:
         raise PhoneError
 
@@ -226,7 +226,7 @@ def phone(*args):
 
 
 COMMANDS = {add_record: "add",
-            add_phone: "add_phone",
+            add_phone: "append phone",
             change_record: "change",
             del_record: "delete",
             end_program: "exit",
@@ -242,12 +242,11 @@ COMMANDS = {add_record: "add",
 
 def parser(text: str):
     for func, kw in COMMANDS.items():
-        command = text.rstrip().split()
-        print(command[0], kw)
-        if kw == command[0].lower:
-            return func, text[len(kw):].strip().split()
-        # if text.lower().startswith(kw):
+        # command = text.rstrip().split()
+        # if kw == command[0].lower():
         #     return func, text[len(kw):].strip().split()
+        if text.lower().startswith(kw):
+            return func, text[len(kw):].strip().split()
     return unknown, []
 
 
