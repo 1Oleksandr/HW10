@@ -32,33 +32,33 @@ class Phone(Field):
 
 class Record:
 
-    def __init__(self, name: Name, phone: Phone = None):
-        self.name = name
+    def __init__(self, name, phone = None):
+        self.name = Name(name)
         self.phones = []
         if phone:
             self.add_phone(phone)
 
     def add_phone(self, phone):
-        self.phones.append(phone)
+        self.phones.append(Phone(phone))
 
     def edit_phone(self, old_phone, new_phone):
         for idx, phone in enumerate(self.phones):
-            if phone.value == old_phone.value:
-                self.phones[idx] = new_phone
+            if phone.value == Phone(old_phone).value:
+                self.phones[idx] = Phone(new_phone)
                 return f"Phone {old_phone} changed to phone {new_phone}"
-        raise PhoneError
+        raise ValueError()
 
     def find_phone(self, phone):
         for p in self.phones:
-            if phone.value == p.value:
-                return phone
-        raise PhoneError
+            if Phone(phone).value == p.value:
+                return p
+        # raise ValueError()
 
     def remove_phone(self, phone):
         for p in self.phones:
-            if phone.value == p.value:
+            if Phone(phone).value == p.value:
                 return self.phones.remove(p)
-        raise PhoneError
+        raise PhoneError()
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -69,19 +69,19 @@ class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
 
-    def find(self, record):
-        rec = self.data.get(record.name.value)
+    def find(self, name):
+        rec = self.data.get(name)
         if rec:
-            f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in rec)}"
+            f"Contact name: {rec.name.value}, phones: {'; '.join(p.value for p in rec.phones)}"
             return rec
-        else:
-            raise KeyError
+        # else:
+        #     raise KeyError()
 
-    def delete(self, record):
-        if self.data.get(record.name.value):
-            del self.data[record.name.value]
-        else:
-            raise KeyError
+    def delete(self, name):
+        if self.data.get(name):
+            del self.data[name]
+        # else:
+        #     raise KeyError()
 
 
 customers = AddressBook()
