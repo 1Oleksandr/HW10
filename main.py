@@ -35,8 +35,8 @@ class Phone(Field):
 
 class Record:
 
-    def __init__(self, name, phone=None):
-        self.name = Name(name)
+    def __init__(self, name: Name, phone: Phone = None):
+        self.name = name
         self.phones = []
         if phone:
             self.add_phone(phone)
