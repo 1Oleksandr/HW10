@@ -25,7 +25,7 @@ class Phone(Field):
     def __init__(self, phone):
         print(type(phone))
         print(len(phone))
-        print("-----------------")
+        print("---------------")
         if len(phone) == 10 and int(phone):
             self.phone = phone
             super().__init__(phone)
