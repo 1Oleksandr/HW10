@@ -10,7 +10,7 @@ class Field:
         self.value = value
 
     def __str__(self):
-        return str(self.value)
+        return self.value
 
     # def __repr__(self) -> str:
     #     return str(self)
@@ -35,11 +35,11 @@ class Phone(Field):
 
 class Record:
 
-    def __init__(self, name: Name, phone: Phone = None):
-        self.name = name
+    def __init__(self, name: str, phone: str = None):
+        self.name = Name(name)
         self.phones = []
         if phone:
-            self.add_phone(phone)
+            self.add_phone(Phone(phone))
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
@@ -109,9 +109,9 @@ def input_error(func):
 
 @input_error
 def add_record(*args):
-    name = Name(args[0].lower())
-    phone = Phone(args[1])
-    rec = customers.get(name.value)
+    name = args[0].lower()
+    phone = args[1]
+    rec = customers.get(name)
     if rec:
         raise NameError
     rec = Record(name, phone)
