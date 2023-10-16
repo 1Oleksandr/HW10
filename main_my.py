@@ -10,7 +10,7 @@ class Field:
         self.value = value
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
     # def __repr__(self) -> str:
     #     return str(self)
@@ -22,44 +22,41 @@ class Name(Field):
 
 class Phone(Field):
 
-    def __init__(self, value):
-        print(type(value))
-        print(len(value))
-        print("---------------")
-        if len(value) == 10 and int(value):
-            self.value = value
-            # super().__init__(phone)
+    def __init__(self, phone):
+        if len(phone) == 10 and int(phone):
+            self.phone = phone
+            super().__init__(phone)
         else:
-            raise ValueError()
+            raise ValueError
 
 
 class Record:
 
-    def __init__(self, name: str, phone: str = None):
-        self.name = Name(name)
+    def __init__(self, name: Name, phone: Phone = None):
+        self.name = name
         self.phones = []
         if phone:
             self.add_phone(phone)
 
     def add_phone(self, phone):
-        self.phones.append(Phone(phone))
+        self.phones.append(phone)
 
     def edit_phone(self, old_phone, new_phone):
         for idx, phone in enumerate(self.phones):
-            if phone.value == old_phone:
-                self.phones[idx] = Phone(new_phone)
+            if phone.value == old_phone.value:
+                self.phones[idx] = new_phone
                 return f"Phone {old_phone} changed to phone {new_phone}"
-        raise ValueError()
+        raise PhoneError()
 
     def find_phone(self, phone):
         for p in self.phones:
-            if Phone(phone).value == p.value:
-                return p
-        # raise ValueError()
+            if phone.value == p.value:
+                return phone
+        raise PhoneError()
 
     def remove_phone(self, phone):
         for p in self.phones:
-            if Phone(phone).value == p.value:
+            if phone.value == p.value:
                 return self.phones.remove(p)
         raise PhoneError()
 
@@ -72,19 +69,19 @@ class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
 
-    def find(self, name):
-        rec = self.data.get(name)
+    def find(self, record):
+        rec = self.data.get(record.name.value)
         if rec:
-            f"Contact name: {rec.name.value}, phones: {'; '.join(p.value for p in rec.phones)}"
+            f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in rec)}"
             return rec
-        # else:
-        #     raise KeyError()
+        else:
+            raise KeyError()
 
-    def delete(self, name):
-        if self.data.get(name):
-            del self.data[name]
-        # else:
-        #     raise KeyError()
+    def delete(self, record):
+        if self.data.get(record.name.value):
+            del self.data[record.name.value]
+        else:
+            raise KeyError()
 
 
 customers = AddressBook()
@@ -109,9 +106,9 @@ def input_error(func):
 
 @input_error
 def add_record(*args):
-    name = args[0].lower()
-    phone = args[1]
-    rec = customers.get(name)
+    name = Name(args[0].lower())
+    phone = Phone(args[1])
+    rec = customers.get(name.value)
     if rec:
         raise NameError
     rec = Record(name, phone)
@@ -121,14 +118,14 @@ def add_record(*args):
 
 @input_error
 def change_record(*args):
-    name = args[0].lower()
-    old_phone = args[1]
-    new_phone = args[2]
-    rec = customers.get(name)
+    name = Name(args[0].lower())
+    old_phone = Phone(args[1])
+    new_phone = Phone(args[2])
+    rec = customers.get(name.value)
     if rec:
         return rec.edit_phone(old_phone, new_phone)
     else:
-        raise KeyError
+        raise KeyError()
 
 
 @input_error
@@ -138,7 +135,7 @@ def find_record(*args):
     if rec:
         return rec
     else:
-        raise KeyError
+        raise KeyError()
 
 
 @input_error
@@ -149,19 +146,19 @@ def del_record(*args):
         customers.delete(rec)
         return f"Record with name {args[0].capitalize()} deleted."
     else:
-        raise KeyError
+        raise KeyError()
 
 
 @input_error
 def add_phone(*args):
-    name = args[0].lower()
-    new_phone = args[1]
-    rec = customers.get(name)
+    name = Name(args[0].lower())
+    new_phone = Phone(args[1])
+    rec = customers.get(name.value)
     if rec:
         rec.add_phone(new_phone)
         return f"{args[0].capitalize()}'s phone added another one {args[1]}"
     else:
-        raise KeyError
+        raise KeyError()
 
 
 @input_error
@@ -173,7 +170,7 @@ def find_phone(*args):
         find_phone = rec.find_phone(phone)
         return find_phone  # f'{name.value} : {find_phone}'
     else:
-        raise PhoneError
+        raise PhoneError()
 
 
 @input_error
@@ -185,7 +182,7 @@ def remove_phone(*args):
         rec.remove_phone(phone)
         return f'{phone.value} deleted.'
     else:
-        raise PhoneError
+        raise PhoneError()
 
 
 def unknown(*args):
