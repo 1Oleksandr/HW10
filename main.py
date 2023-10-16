@@ -23,12 +23,8 @@ class Name(Field):
 class Phone(Field):
 
     def __init__(self, value):
-        print(type(value))
-        print(len(value))
-        print("---------------")
         if len(value) == 10 and int(value):
             self.value = value
-            # super().__init__(phone)
         else:
             raise ValueError()
 
@@ -133,20 +129,18 @@ def change_record(*args):
 
 @input_error
 def find_record(*args):
-    name = Name(args[0].lower())
-    rec = customers.get(name.value)
-    if rec:
-        return rec
+    name = args[0].lower()
+    if customers.get(name):
+        return customers.find(name)
     else:
         raise KeyError
 
 
 @input_error
 def del_record(*args):
-    name = Name(args[0].lower())
-    rec = customers.get(name.value)
-    if rec:
-        customers.delete(rec)
+    name = args[0].lower()
+    if customers.get(name):
+        customers.delete(name)
         return f"Record with name {args[0].capitalize()} deleted."
     else:
         raise KeyError
@@ -166,9 +160,9 @@ def add_phone(*args):
 
 @input_error
 def find_phone(*args):
-    name = Name(args[0].lower())
-    phone = Phone(args[1])
-    rec = customers.get(name.value)
+    name = args[0].lower()
+    phone = args[1]
+    rec = customers.get(name)
     if rec:
         find_phone = rec.find_phone(phone)
         return find_phone  # f'{name.value} : {find_phone}'
@@ -178,12 +172,12 @@ def find_phone(*args):
 
 @input_error
 def remove_phone(*args):
-    name = Name(args[0].lower())
-    phone = Phone(args[1])
-    rec = customers.get(name.value)
+    name = args[0].lower()
+    phone = args[1]
+    rec = customers.get(name)
     if rec:
         rec.remove_phone(phone)
-        return f'{phone.value} deleted.'
+        return f'{phone} deleted.'
     else:
         raise PhoneError
 
